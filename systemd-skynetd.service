@@ -1,0 +1,11 @@
+[Unit]
+Description=SkyRing Node Eventing Daemon to push signals to SkyRing
+
+[Service]
+Type=simple
+PIDFile=/var/run/skynetd.pid
+ExecReload=/usr/bin/skynetd reload
+ExecStart=/usr/bin/skynetd start
+ExecStop=/usr/bin/skynetd stop
+
+KillMode=process
