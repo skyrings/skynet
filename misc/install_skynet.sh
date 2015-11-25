@@ -47,7 +47,11 @@ if [ $? -ne 0 ]; then
     error "Failed to update packages"
 fi
 
-yum -y install git salt-minion python-pep8 pyflakes salt https://kojipkgs.fedoraproject.org//packages/storaged/2.2.0/1.fc23/x86_64/libstoraged-2.2.0-1.fc23.x86_64.rpm https://kojipkgs.fedoraproject.org//packages/storaged/2.2.0/1.fc23/x86_64/storaged-2.2.0-1.fc23.x86_64.rpm https://kojipkgs.fedoraproject.org//packages/storaged/2.2.0/1.fc23/x86_64/storaged-lvm2-2.2.0-1.fc23.x86_64.rpm
+yum -y install git salt-minion python-pep8 pyflakes salt https://kojipkgs.fedoraproject.org//packages/storaged/2.2.0/1.fc23/x86_64/libstoraged-2.2.0-1.fc23.x86_64.rpm https://kojipkgs.fedoraproject.org//packages/storaged/2.2.0/1.fc23/x86_64/storaged-2.2.0-1.fc23.x86_64.rpm https://kojipkgs.fedoraproject.org//packages/storaged/2.2.0/1.fc23/x86_64/storaged-lvm2-2.2.0-1.fc23.x86_64.rpm collectd collectd-amqp
+
+cp src/collectd_scripts/* /usr/lib64/collectd/
+useradd skyring-user -g wheel
+echo "skyring-user ALL=(ALL) NOPASSWD:ALL" | (EDITOR="tee -a" visudo)
 
 dbus-send --system --print-reply --type=method_call --dest=org.storaged.Storaged /org/storaged/Storaged/Manager org.storaged.Storaged.Manager.EnableModules boolean:true
 
