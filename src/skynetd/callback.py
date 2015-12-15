@@ -144,9 +144,10 @@ class Callback(object):
                 res["tags"]["Seat"] = str(v.get("Seat"))
                 res["tags"]["Serial"] = str(v.get("Serial"))
                 res["tags"]["Vendor"] = str(v.get("Vendor"))
-                res["message"] = "New storage drive of size %s Gb added"
-                " Id: %s" % (str(float(res["tags"]["size"])/(ONE_GB_IN_KB)),
-                             res["tags"]["ID"])
+                res["message"] = "New storage drive of size %s Gb added"\
+                                 " Id: %s" % (str(
+                                     float(res["tags"]["size"])/(ONE_GB_IN_KB)
+                                 ), res["tags"]["ID"])
                 res["severity"] = "INFO"
                 tag = "dbus/node/{0}/generic/storage/drive/added".format(
                     self.minion_id)
@@ -188,8 +189,8 @@ class Callback(object):
             res["message"] = "Device with id: %s might be failing" % (
                 device_id)
             res["severity"] = "Critical"
-            tag = "dbus/node/{0}/generic/storage/drive/possible"
-            "Failure".format(self.minion_id)
+            tag = "dbus/node/{0}/generic/storage/drive/possible"\
+                  "Failure".format(self.minion_id)
             self.caller.sminion.functions['event.send'](
                 tag,
                 res
@@ -231,9 +232,11 @@ class Callback(object):
                     '/')[-1].replace("_", "-")
                 res["tags"]["size"] = str(v.get("Size"))
                 res["tags"]["ID"] = str(v.get("Id"))
-                res["message"] = "New Block Device %s of size %s "
-                "GB added" % (res["tags"]["DeviceName"],
-                              str(float(res["tags"]["size"])/(ONE_GB_IN_KB)))
+                res["message"] = "New Block Device %s of size %s "\
+                                 "GB added" % (res["tags"]["DeviceName"],
+                                               str(float(
+                                                   res["tags"]["size"]
+                                               )/(ONE_GB_IN_KB)))
                 res["severity"] = "INFO"
             elif e.split('.')[-1] == "Partition":
                 res["tags"]["PartitionNumber"] = str(v.get("Number"))
@@ -242,7 +245,7 @@ class Callback(object):
                 res["tags"]["Table"] = str(v.get("Table")).split('/')[-1]
                 res["tags"]["Type"] = str(v.get("Type"))
 
-        if res:
+        if res['tags']:
             tag = "dbus/node/{0}/generic/storage/block/added".format(
                 self.minion_id)
             self.caller.sminion.functions['event.send'](
@@ -260,8 +263,8 @@ class Callback(object):
                 res["message"] = "Block Device %s Removed" % (
                     res["tags"]["DeviceName"])
                 res["severity"] = "Warning"
-                tag = "dbus/node/{0}/generic/storage/block/"
-                "removed".format(self.minion_id)
+                tag = "dbus/node/{0}/generic/storage/block/"\
+                      "removed".format(self.minion_id)
                 self.caller.sminion.functions['event.send'](
                     tag,
                     res
@@ -280,10 +283,9 @@ class Callback(object):
                     for e in mPoint:
                         mountPoint += str(e)
                     mountPoints.append(mountPoint[:-1])
-                    res["tags"]["MountPoints"] = mountPoints
-            res["message"] = "Device %s mounted on following mount points"
-            ": %s" % (res["tags"]["DeviceName"], ",".join(
-                res["tags"]["MountPoints"]))
+            res["message"] = "Device %s mounted on following mount points"\
+                             ": %s" % (res["tags"]["DeviceName"], ",".join(
+                                 mountPoints))
             res["severity"] = "INFO"
             tag = "dbus/node/{0}/generic/storage/mount/changed".format(
                 self.minion_id)
@@ -348,8 +350,8 @@ class Callback(object):
         res["tags"]["serviceName"] = "Glusterd"
         res["tags"]["ActiveState"] = str(b.get("ActiveState"))
         res["tags"]["SubState"] = str(b.get("SubState"))
-        res["message"] = "glusterd process state changed"
-        " to %s" % (res["tags"]["ActiveState"])
+        res["message"] = "glusterd process state changed"\
+                         " to %s" % (res["tags"]["ActiveState"])
         res["severity"] = "Warning"
         tag = "dbus/node/{0}/glusterfs/service/glusterd".format(self.minion_id)
         self.caller.sminion.functions['event.send'](
