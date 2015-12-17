@@ -3,7 +3,6 @@
 # This is a single script which will install required packages,
 # Configure and setting up the system to use skynet on storage node.
 
-set -e
 
 RED='\033[0;31m'
 GREEN='\033[0;32m'
@@ -48,7 +47,7 @@ if [ $? -ne 0 ]; then
     error "Failed to update packages"
 fi
 
-yum -y install git salt-minion salt https://kojipkgs.fedoraproject.org//packages/storaged/2.2.0/1.fc23/x86_64/libstoraged-2.2.0-1.fc23.x86_64.rpm https://kojipkgs.fedoraproject.org//packages/storaged/2.2.0/1.fc23/x86_64/storaged-2.2.0-1.fc23.x86_64.rpm https://kojipkgs.fedoraproject.org//packages/storaged/2.2.0/1.fc23/x86_64/storaged-lvm2-2.2.0-1.fc23.x86_64.rpm
+yum -y install git salt-minion python-pep8 pyflakes salt https://kojipkgs.fedoraproject.org//packages/storaged/2.2.0/1.fc23/x86_64/libstoraged-2.2.0-1.fc23.x86_64.rpm https://kojipkgs.fedoraproject.org//packages/storaged/2.2.0/1.fc23/x86_64/storaged-2.2.0-1.fc23.x86_64.rpm https://kojipkgs.fedoraproject.org//packages/storaged/2.2.0/1.fc23/x86_64/storaged-lvm2-2.2.0-1.fc23.x86_64.rpm
 
 dbus-send --system --print-reply --type=method_call --dest=org.storaged.Storaged /org/storaged/Storaged/Manager org.storaged.Storaged.Manager.EnableModules boolean:true
 
@@ -64,8 +63,28 @@ mkdir -p /etc/skynet
 # clone and install packages
 git clone https://review.gerrithub.io/skyrings/skynet
 cd skynet
+
+set -x
+
+pep8 ./
+
+if [ $? -ne 0 ]; then
+    error "pep8 Tests Failed"
+    exit 1
+fi
+
+pyflakes ./
+
+if [ $? -ne 0 ]; then
+    error "pyflakes Tests Failed"
+    exit 1
+fi
+
+set +x
+
 python setup.py install
-cp src/skynetd/conf/skynet.conf /etc/skynet
+cp src/skynetd/conf/skynet.conf.sample /etc/skynet/skynet.conf
+cp src/skynetd/conf/skynet-log.conf.sample /etc/skynet/skynet-log.conf
 cp systemd-skynetd.service /usr/lib/systemd/system/
 
 info "Installation Completed! skynetd can be satated using \"service systemd-skynetd start\""

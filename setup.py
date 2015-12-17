@@ -13,18 +13,18 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from setuptools import setup, find_packages
+from setuptools import setup
 
 setup(
     name='skynet',
     version='1',
     description='Skyring Node Eventing Agent',
-    long_description="skynet is the node eventing agent for Skyring."\
-    " Each storage node managed by Skyring will have this agent running on them."\
-    " It is a daemon which listens to dbus signals, filters it, "\
-    "processes it and pushes the filtered signals to Skyring using"\
-    " saltstack's eventing framework. Currently this daemon has capability"\
-    " to send basic storage related, few node process related and"\
+    long_description="skynet is the node eventing agent for Skyring."
+    " Each storage node managed by Skyring will have this agent running on"
+    " them. It is a daemon which listens to dbus signals, filters it, "
+    "processes it and pushes the filtered signals to Skyring using"
+    " saltstack's eventing framework. Currently this daemon has capability"
+    " to send basic storage related, few node process related and"
     " network related events.",
 
     # The project's main homepage.
@@ -48,7 +48,7 @@ setup(
 
     keywords='Skyring node Eventing Agent',
 
-    packages = ["skynetd"],
+    packages=["skynetd"],
     package_dir={
         'skynetd': 'src/skynetd'
     },
