@@ -1,18 +1,16 @@
-%define name skynet
-%define version 0.0.1
-%define release 0.1
+%define pkg_name skynet
+%define pkg_version 0.0.1
+%define pkg_release 1
 
-%global _etcdir /etc
-
-Name: %{name}
-Version: %{version}
-Release: %{release}%{?dist}
+Name: %{pkg_name}
+Version: %{pkg_version}
+Release: %{pkg_release}%{?dist}
 BuildArch: noarch
 Summary: Skyring Node Eventing Agent
-Source0: %{name}-%{version}.tar.gz
+Source0: %{pkg_name}-%{pkg_version}.tar.gz
 License: Apache License, Version 2.0
 Group: Development/Libraries
-BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-buildroot
+BuildRoot: %{_tmppath}/%{pkg_name}-%{pkg_version}-%{pkg_release}-buildroot
 Url: https://github.com/skyrings/skynet
 
 BuildRequires: python-devel
@@ -34,7 +32,7 @@ Skyring using saltstack eventing framework. Currently this daemon has capability
 to send basic storage related, few node process related and network related events.
 
 %prep
-%setup -n %{name}-%{version}
+%setup -n %{pkg_name}-%{pkg_version}
 
 %build
 python setup.py build
@@ -57,8 +55,8 @@ rm -rf "$RPM_BUILD_ROOT"
 
 %files -f INSTALLED_FILES
 %defattr(-,root,root)
-%_etcdir/skynet/
-%_etcdir/skynet/skynet.conf
+%{_sysconfdir}/skynet/
+%{_sysconfdir}/skynet/skynet.conf
 /usr/lib/systemd/system/systemd-skynetd.service
 
 %changelog
