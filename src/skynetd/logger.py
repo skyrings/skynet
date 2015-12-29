@@ -17,7 +17,8 @@
 import os
 import errno
 import logging
-from constants import DEFAULT_LOG_FILE, DEFAULT_LOG_LEVEL, LOG_FORMAT, SKYNET_LOG_CONF_FILE
+from constants import DEFAULT_LOG_FILE, DEFAULT_LOG_LEVEL,\
+    LOG_FORMAT, SKYNET_LOG_CONF_FILE
 
 
 def get_log_path():

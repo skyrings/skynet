@@ -177,8 +177,8 @@ class Callback(object):
                                      float(res["tags"]["size"])/(ONE_GB_IN_KB)
                                  ), res["tags"]["ID"])
                 res["severity"] = "INFO"
-                tag = "dbus/node/{0}/generic/storage/drive/added".format(
-                    self.minion_id)
+                tag = "skyring/dbus/node/{0}/generic/storage/drive/"\
+                      "added".format(self.minion_id)
                 return res, tag
 
     @dbus_signal_handler
@@ -192,8 +192,8 @@ class Callback(object):
                 res["message"] = "Storage drive Removed ID: %s" % (
                     res["tags"]["ID"])
                 res["severity"] = "Warning"
-                tag = "dbus/node/{0}/generic/storage/drive/removed".format(
-                    self.minion_id)
+                tag = "skyring/dbus/node/{0}/generic/storage/drive/"\
+                      "removed".format(self.minion_id)
                 return res, tag
 
     @dbus_signal_handler
@@ -213,7 +213,7 @@ class Callback(object):
             res["message"] = "Device with id: %s might be failing" % (
                 device_id)
             res["severity"] = "Critical"
-            tag = "dbus/node/{0}/generic/storage/drive/possible"\
+            tag = "skyring/dbus/node/{0}/generic/storage/drive/possible"\
                   "Failure".format(self.minion_id)
             return res, tag
 
@@ -233,7 +233,7 @@ class Callback(object):
             res["message"] = "Properties of block device %s has changed" % (
                 device_name)
             res["severity"] = "INFO"
-            tag = "dbus/node/{0}/generic/storage/block/changed".format(
+            tag = "skyring/dbus/node/{0}/generic/storage/block/changed".format(
                 self.minion_id)
             return res, tag
 
@@ -266,7 +266,7 @@ class Callback(object):
                 res["tags"]["Type"] = str(v.get("Type"))
 
         if res['tags']:
-            tag = "dbus/node/{0}/generic/storage/block/added".format(
+            tag = "skyring/dbus/node/{0}/generic/storage/block/added".format(
                 self.minion_id)
             return res, tag
 
@@ -281,8 +281,8 @@ class Callback(object):
                 res["message"] = "Block Device %s Removed" % (
                     res["tags"]["DeviceName"])
                 res["severity"] = "Warning"
-                tag = "dbus/node/{0}/generic/storage/block/"\
-                      "removed".format(self.minion_id)
+                tag = "skyring/dbus/node/{0}/generic/storage/block/"\
+                "removed".format(self.minion_id)
                 return res, tag
 
     @dbus_signal_handler
@@ -303,7 +303,7 @@ class Callback(object):
                              ": %s" % (res["tags"]["DeviceName"], ",".join(
                                  mountPoints))
             res["severity"] = "INFO"
-            tag = "dbus/node/{0}/generic/storage/mount/changed".format(
+            tag = "skyring/dbus/node/{0}/generic/storage/mount/changed".format(
                 self.minion_id)
             return res, tag
 
@@ -315,7 +315,7 @@ class Callback(object):
         res["tags"]["action"] = "added"
         res["message"] = "Network device added"
         res["severity"] = "info"
-        tag = "dbus/node/{0}/generic/network/device/added".format(
+        tag = "skyring/dbus/node/{0}/generic/network/device/added".format(
             self.minion_id)
         return res, tag
 
@@ -327,7 +327,7 @@ class Callback(object):
         res["tags"]["action"] = "removed"
         res["message"] = "Network device removed"
         res["severity"] = "info"
-        tag = "dbus/node/{0}/generic/network/device/removed".format(
+        tag = "skyring/dbus/node/{0}/generic/network/device/removed".format(
             self.minion_id)
         return res, tag
 
@@ -345,8 +345,8 @@ class Callback(object):
         res["tags"]["deviceNo"] = str(path.split('/')[-1])
         res["message"] = "Network device property changed"
         res["severity"] = "info"
-        tag = "dbus/node/{0}/generic/network/device/propertyChanged".format(
-            self.minion_id)
+        tag = "skyring/dbus/node/{0}/generic/network/device/"\
+              "propertyChanged".format(self.minion_id)
         return res, tag
 
     @dbus_signal_handler
@@ -361,7 +361,8 @@ class Callback(object):
         res["message"] = "glusterd process state changed"\
                          " to %s" % (res["tags"]["ActiveState"])
         res["severity"] = "Warning"
-        tag = "dbus/node/{0}/glusterfs/service/glusterd".format(self.minion_id)
+        tag = "skyring/dbus/node/{0}/glusterfs/service/"\
+              "glusterd".format(self.minion_id)
         return res, tag
 
     @dbus_signal_handler
@@ -376,7 +377,7 @@ class Callback(object):
         res["message"] = "salt-minion process state changed to %s" % (
             res["tags"]["ActiveState"])
         res["severity"] = "Warning"
-        tag = "dbus/node/{0}/generic/service/salt_minion".format(
+        tag = "skyring/dbus/node/{0}/generic/service/salt_minion".format(
             self.minion_id)
         return res, tag
 
@@ -392,7 +393,8 @@ class Callback(object):
         res["message"] = "collectd process state changed to %s" % (
             res["tags"]["ActiveState"])
         res["severity"] = "Warning"
-        tag = "dbus/node/{0}/generic/service/collectd".format(self.minion_id)
+        tag = "skyring/dbus/node/{0}/generic/service/collectd".format(
+            self.minion_id)
         return res, tag
 
     @dbus_signal_handler
@@ -405,7 +407,8 @@ class Callback(object):
         res["tags"]['UUID'] = str(b[b.keys()[0]].get('UUID'))
         res["tags"]['Size'] = str(b[b.keys()[0]].get('Size'))
         res["tags"]['FreeSize'] = str(b[b.keys()[0]].get('FreeSize'))
-        tag = "dbus/node/{0}/generic/lvm/vg/create".format(self.minion_id)
+        tag = "skyring/dbus/node/{0}/generic/lvm/vg/create".format(
+            self.minion_id)
         return res, tag
 
     @dbus_signal_handler
@@ -425,7 +428,8 @@ class Callback(object):
                 'ThinPool')).split('/')
         res["tags"]['VolumeGroup'] = str(b[b.keys()[0]].get(
             'VolumeGroup')).split('/')[-1]
-        tag = "dbus/node/{0}/generic/lvm/lv/create".format(self.minion_id)
+        tag = "skyring/dbus/node/{0}/generic/lvm/lv/create".format(
+            self.minion_id)
         return res, tag
 
     @dbus_signal_handler
@@ -437,7 +441,8 @@ class Callback(object):
         tv = str(a).split('/')
         res["tags"]['LvName'] = tv[-2] + "/" + tv[-1]
         res["tags"]['Action'] = "Removed"
-        tag = "dbus/node/{0}/generic/lvm/lv/delete".format(self.minion_id)
+        tag = "skyring/dbus/node/{0}/generic/lvm/lv/delete".format(
+            self.minion_id)
         return res, tag
 
     @dbus_signal_handler
@@ -449,7 +454,8 @@ class Callback(object):
         tv = str(a).split('/')
         res["tags"]['VgName'] = tv[-1]
         res["tags"]['Action'] = "Removed"
-        tag = "dbus/node/{0}/generic/lvm/vg/delete".format(self.minion_id)
+        tag = "skyring/dbus/node/{0}/generic/lvm/vg/delete".format(
+            self.minion_id)
         return res, tag
 
 
