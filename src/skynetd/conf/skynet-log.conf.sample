@@ -1,0 +1,8 @@
+# Log level for skynet daemon
+# Possible values: DEBUG/INFO/WARNING/ERROR/CRITICAL
+
+LOG_LEVEL = INFO
+
+# The LOG File location for skynet log
+
+LOG_FILE = /var/log/skynet/skynet.log

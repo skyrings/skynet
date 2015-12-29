@@ -16,8 +16,10 @@
 import json
 import inspect
 import salt.config
+from functools import wraps
+from logger import logger
+from constants import ONE_GB_IN_KB, SKYNET_CONF_FILE
 
-ONE_GB_IN_KB = 1073741824.0
 
 cb_info = {
     "drive_add": {
@@ -125,14 +127,40 @@ cb_info = {
 }
 
 
+def dbus_signal_handler(func):
+    @wraps(func)
+    def wrapper(*args, **kwargs):
+        try:
+            res, tag = func(*args, **kwargs)
+            if not res and not tag:
+                return
+
+            args[0].caller.sminion.functions['event.send'](
+                tag,
+                res
+            )
+            logger.debug("Event Pushed successfully - Handler: %s | Data: %s |"
+                         " Tag: %s" % (func.func_name, str(res), str(tag)))
+        except Exception as e:
+            logger.error("Error in handler: %s | Reason: %s | Args: %s |"
+                         " Kwargs: %s" % (func.func_name, str(e),
+                                          str(args), str(kwargs)))
+    return wrapper
+
+
 class Callback(object):
     """
     Call back class that contains all the callback functions.
     """
     def __init__(self, caller):
         self.caller = caller
-        self.minion_id = salt.config.minion_config('/etc/salt/minion')['id']
+        try:
+            self.minion_id = salt.config.minion_config(
+                '/etc/salt/minion')['id']
+        except Exception as e:
+            logger.error("Could not get the salt minion id: %s", str(e))
 
+    @dbus_signal_handler
     def drive_add(self, a, d, path):
         for k, v in d.iteritems():
             if k.split('.')[-1] == "Drive":
@@ -151,11 +179,9 @@ class Callback(object):
                 res["severity"] = "INFO"
                 tag = "dbus/node/{0}/generic/storage/drive/added".format(
                     self.minion_id)
-                self.caller.sminion.functions['event.send'](
-                    tag,
-                    res
-                )
+                return res, tag
 
+    @dbus_signal_handler
     def drive_remove(self, a, d, path):
         for e in d:
             if e.split('.')[-1] == "Drive":
@@ -168,11 +194,9 @@ class Callback(object):
                 res["severity"] = "Warning"
                 tag = "dbus/node/{0}/generic/storage/drive/removed".format(
                     self.minion_id)
-                self.caller.sminion.functions['event.send'](
-                    tag,
-                    res
-                )
+                return res, tag
 
+    @dbus_signal_handler
     def drive_corruption(self, a, d, c, path):
         res = {}
         res["tags"] = {}
@@ -184,18 +208,16 @@ class Callback(object):
                     res["tags"][str(k)] = str(v)
 
             if not res:
-                return
+                return None, None
             res["tags"]["deviceId"] = device_id
             res["message"] = "Device with id: %s might be failing" % (
                 device_id)
             res["severity"] = "Critical"
             tag = "dbus/node/{0}/generic/storage/drive/possible"\
                   "Failure".format(self.minion_id)
-            self.caller.sminion.functions['event.send'](
-                tag,
-                res
-            )
+            return res, tag
 
+    @dbus_signal_handler
     def block_property_changed(self, a, d, c, path):
         res = {}
         res["tags"] = {}
@@ -206,18 +228,16 @@ class Callback(object):
                     res["tags"][str(k)] = str(v)
 
             if not res:
-                return
+                return None, None
             res["tags"]["deviceName"] = device_name
             res["message"] = "Properties of block device %s has changed" % (
                 device_name)
             res["severity"] = "INFO"
             tag = "dbus/node/{0}/generic/storage/block/changed".format(
                 self.minion_id)
-            self.caller.sminion.functions['event.send'](
-                tag,
-                res
-            )
+            return res, tag
 
+    @dbus_signal_handler
     def block_add(self, a, d, path):
         res = {}
         res["tags"] = {}
@@ -248,11 +268,9 @@ class Callback(object):
         if res['tags']:
             tag = "dbus/node/{0}/generic/storage/block/added".format(
                 self.minion_id)
-            self.caller.sminion.functions['event.send'](
-                tag,
-                res
-            )
+            return res, tag
 
+    @dbus_signal_handler
     def block_remove(self, a, d, path):
         for e in d:
             if e.split('.')[-1] == "Block":
@@ -265,11 +283,9 @@ class Callback(object):
                 res["severity"] = "Warning"
                 tag = "dbus/node/{0}/generic/storage/block/"\
                       "removed".format(self.minion_id)
-                self.caller.sminion.functions['event.send'](
-                    tag,
-                    res
-                )
+                return res, tag
 
+    @dbus_signal_handler
     def mount_state_change(self, a, d, c, path):
         res = {}
         res["tags"] = {}
@@ -289,11 +305,9 @@ class Callback(object):
             res["severity"] = "INFO"
             tag = "dbus/node/{0}/generic/storage/mount/changed".format(
                 self.minion_id)
-            self.caller.sminion.functions['event.send'](
-                tag,
-                res
-            )
+            return res, tag
 
+    @dbus_signal_handler
     def network_device_added(self, a, path):
         res = {}
         res["tags"] = {}
@@ -303,11 +317,9 @@ class Callback(object):
         res["severity"] = "info"
         tag = "dbus/node/{0}/generic/network/device/added".format(
             self.minion_id)
-        self.caller.sminion.functions['event.send'](
-            tag,
-            res
-        )
+        return res, tag
 
+    @dbus_signal_handler
     def network_device_removed(self, a, path):
         res = {}
         res["tags"] = {}
@@ -317,11 +329,9 @@ class Callback(object):
         res["severity"] = "info"
         tag = "dbus/node/{0}/generic/network/device/removed".format(
             self.minion_id)
-        self.caller.sminion.functions['event.send'](
-            tag,
-            res
-        )
+        return res, tag
 
+    @dbus_signal_handler
     def network_device_changed(self, d, path):
         res = {}
         res["tags"] = {}
@@ -331,20 +341,18 @@ class Callback(object):
                               "AvailableConnections"]:
                 res["tags"][str(k)] = str(v)
         if not res["tags"]:
-            return
+            return None, None
         res["tags"]["deviceNo"] = str(path.split('/')[-1])
         res["message"] = "Network device property changed"
         res["severity"] = "info"
         tag = "dbus/node/{0}/generic/network/device/propertyChanged".format(
             self.minion_id)
-        self.caller.sminion.functions['event.send'](
-            tag,
-            res
-        )
+        return res, tag
 
+    @dbus_signal_handler
     def glusterd_status(self, a, b, c, path):
         if str(a).split('.')[-1] != "Unit":
-            return
+            return None, None
         res = {}
         res["tags"] = {}
         res["tags"]["serviceName"] = "Glusterd"
@@ -354,14 +362,12 @@ class Callback(object):
                          " to %s" % (res["tags"]["ActiveState"])
         res["severity"] = "Warning"
         tag = "dbus/node/{0}/glusterfs/service/glusterd".format(self.minion_id)
-        self.caller.sminion.functions['event.send'](
-            tag,
-            res
-        )
+        return res, tag
 
+    @dbus_signal_handler
     def salt_minion_status(self, a, b, c, path):
         if str(a).split('.')[-1] != "Unit":
-            return
+            return None, None
         res = {}
         res["tags"] = {}
         res["tags"]["serviceName"] = "salt-minion"
@@ -372,14 +378,12 @@ class Callback(object):
         res["severity"] = "Warning"
         tag = "dbus/node/{0}/generic/service/salt_minion".format(
             self.minion_id)
-        self.caller.sminion.functions['event.send'](
-            tag,
-            res
-        )
+        return res, tag
 
+    @dbus_signal_handler
     def collectd_status(self, a, b, c, path):
         if str(a).split('.')[-1] != "Unit":
-            return
+            return None, None
         res = {}
         res["tags"] = {}
         res["tags"]["serviceName"] = "collectd"
@@ -389,14 +393,12 @@ class Callback(object):
             res["tags"]["ActiveState"])
         res["severity"] = "Warning"
         tag = "dbus/node/{0}/generic/service/collectd".format(self.minion_id)
-        self.caller.sminion.functions['event.send'](
-            tag,
-            res
-        )
+        return res, tag
 
+    @dbus_signal_handler
     def lvm_vg_create(self, a, b, path):
         if b.keys()[0] != "org.storaged.Storaged.VolumeGroup":
-            return
+            return None, None
         res = {}
         res["tags"] = {}
         res["tags"]['VgName'] = str(b[b.keys()[0]].get('Name'))
@@ -404,15 +406,12 @@ class Callback(object):
         res["tags"]['Size'] = str(b[b.keys()[0]].get('Size'))
         res["tags"]['FreeSize'] = str(b[b.keys()[0]].get('FreeSize'))
         tag = "dbus/node/{0}/generic/lvm/vg/create".format(self.minion_id)
-        self.caller.sminion.functions['event.send'](
-            tag,
-            res,
-            with_env=True
-        )
+        return res, tag
 
+    @dbus_signal_handler
     def lvm_lv_create(self, a, b, path):
         if b.keys()[0] != "org.storaged.Storaged.LogicalVolume":
-            return
+            return None, None
         res = {}
         res["tags"] = {}
         res["tags"]['LvName'] = str(b[b.keys()[0]].get('Name'))
@@ -427,38 +426,31 @@ class Callback(object):
         res["tags"]['VolumeGroup'] = str(b[b.keys()[0]].get(
             'VolumeGroup')).split('/')[-1]
         tag = "dbus/node/{0}/generic/lvm/lv/create".format(self.minion_id)
-        self.caller.sminion.functions['event.send'](
-            tag,
-            res
-        )
+        return res, tag
 
+    @dbus_signal_handler
     def lvm_lv_delete(self, a, b, path):
         if str(b[0]) != "org.storaged.Storaged.LogicalVolume":
-            return
+            return None, None
         res = {}
         res["tags"] = {}
         tv = str(a).split('/')
         res["tags"]['LvName'] = tv[-2] + "/" + tv[-1]
         res["tags"]['Action'] = "Removed"
         tag = "dbus/node/{0}/generic/lvm/lv/delete".format(self.minion_id)
-        self.caller.sminion.functions['event.send'](
-            tag,
-            res
-        )
+        return res, tag
 
+    @dbus_signal_handler
     def lvm_vg_delete(self, a, b, path):
         if str(b[0]) != "org.storaged.Storaged.VolumeGroup":
-            return
+            return None, None
         res = {}
         res["tags"] = {}
         tv = str(a).split('/')
         res["tags"]['VgName'] = tv[-1]
         res["tags"]['Action'] = "Removed"
         tag = "dbus/node/{0}/generic/lvm/vg/delete".format(self.minion_id)
-        self.caller.sminion.functions['event.send'](
-            tag,
-            res
-        )
+        return res, tag
 
 
 def get_enabled_methods(cb):
@@ -467,8 +459,14 @@ def get_enabled_methods(cb):
     return's a dictionary with function name as key and function as
     value of all the enabled methods
     """
-    f = open("/etc/skynet/skynet.conf", 'r')
-    conf = json.loads(f.read())
+    try:
+        with open(SKYNET_CONF_FILE, 'r') as f:
+            conf = json.loads(f.read())
+    except IOError:
+        logger.error(
+            "Configuration file: /etc/skynet/skynet.conf could not be read")
+        exit(1)
+
     enabled_methods = []
     for group, info in conf.iteritems():
         if not conf[group]['enabled']:
