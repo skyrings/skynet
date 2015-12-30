@@ -17,6 +17,7 @@ BuildRequires: python-devel
 BuildRequires: python-setuptools
 
 Requires: collectd
+Requires: collectd-amqp
 Requires: libstoraged
 Requires: python-daemon
 Requires: python-setuptools
@@ -44,10 +45,20 @@ install -m 755 -d $RPM_BUILD_ROOT/etc/skynet
 install -D src/skynetd/conf/skynet.conf.sample $RPM_BUILD_ROOT/etc/skynet/skynet.conf
 install -D src/skynetd/conf/skynet-log.conf.sample $RPM_BUILD_ROOT/etc/skynet/skynet-log.conf
 install -D systemd-skynetd.service $RPM_BUILD_ROOT/usr/lib/systemd/system/systemd-skynetd.service
+install -D src/collectd_scripts/handle_collectd_notification.py $RPM_BUILD_ROOT/usr/lib64/collectd/handle_collectd_notification.py
+install -D src/collectd_scripts/rootWrapper.sh $RPM_BUILD_ROOT/usr/lib64/collectd/rootWrapper.sh
+
+%pre
+if [ `grep -c ^skyring-user /etc/passwd` = "0" ]; then
+    /usr/sbin/useradd skyring-user -g wheel
+fi
 
 %post
 dbus-send --system --print-reply --type=method_call --dest=org.storaged.Storaged /org/storaged/Storaged/Manager org.storaged.Storaged.Manager.EnableModules boolean:true
 /bin/systemctl restart systemd-skynetd.service >/dev/null 2>&1 || :
+if [ `grep -c ^skyring-user /etc/sudoers` = "0" ]; then
+    echo "skyring-user ALL=(ALL) NOPASSWD:ALL" | (EDITOR="tee -a" visudo)
+fi
 
 %preun
 
@@ -59,7 +70,9 @@ rm -rf "$RPM_BUILD_ROOT"
 %{_sysconfdir}/skynet/
 %{_sysconfdir}/skynet/skynet.conf
 %{_sysconfdir}/skynet/skynet-log.conf
-/usr/lib/systemd/system/systemd-skynetd.service
+%{_usr}/lib/systemd/system/systemd-skynetd.service
+%{_usr}/lib64/collectd/
+
 
 %changelog
 * Thu Dec 03 2015 <tjeyasin@redhat.com>
