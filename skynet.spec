@@ -41,7 +41,8 @@ python setup.py build
 rm -rf $RPM_BUILD_ROOT
 python setup.py install --single-version-externally-managed -O1 --root=$RPM_BUILD_ROOT --record=INSTALLED_FILES
 install -m 755 -d $RPM_BUILD_ROOT/etc/skynet
-install -D src/skynetd/conf/skynet.conf $RPM_BUILD_ROOT/etc/skynet/skynet.conf
+install -D src/skynetd/conf/skynet.conf.sample $RPM_BUILD_ROOT/etc/skynet/skynet.conf
+install -D src/skynetd/conf/skynet-log.conf.sample $RPM_BUILD_ROOT/etc/skynet/skynet-log.conf
 install -D systemd-skynetd.service $RPM_BUILD_ROOT/usr/lib/systemd/system/systemd-skynetd.service
 
 %post
@@ -57,6 +58,7 @@ rm -rf "$RPM_BUILD_ROOT"
 %defattr(-,root,root)
 %{_sysconfdir}/skynet/
 %{_sysconfdir}/skynet/skynet.conf
+%{_sysconfdir}/skynet/skynet-log.conf
 /usr/lib/systemd/system/systemd-skynetd.service
 
 %changelog
