@@ -17,7 +17,6 @@ BuildRequires: python-devel
 BuildRequires: python-setuptools
 
 Requires: collectd
-Requires: collectd-amqp
 Requires: libstoraged
 Requires: python-daemon
 Requires: python-setuptools
