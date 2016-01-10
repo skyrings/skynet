@@ -46,6 +46,7 @@ install -D src/skynetd/conf/skynet-log.conf.sample $RPM_BUILD_ROOT/etc/skynet/sk
 install -D systemd-skynetd.service $RPM_BUILD_ROOT/usr/lib/systemd/system/systemd-skynetd.service
 install -D src/collectd_scripts/handle_collectd_notification.py $RPM_BUILD_ROOT/usr/lib64/collectd/handle_collectd_notification.py
 install -D src/collectd_scripts/rootWrapper.sh $RPM_BUILD_ROOT/usr/lib64/collectd/rootWrapper.sh
+install -D src/collectd_scripts/collectd_influxdb.py $RPM_BUILD_ROOT/usr/lib64/collectd/collectd_influxdb.py
 
 %pre
 if [ `grep -c ^skyring-user /etc/passwd` = "0" ]; then
