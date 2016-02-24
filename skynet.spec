@@ -18,6 +18,7 @@ BuildRequires: python-setuptools
 
 Requires: collectd
 Requires: libstoraged
+Requires: python-cpopen
 Requires: python-daemon
 Requires: python-setuptools
 Requires: salt-minion >= 2015.5.5
