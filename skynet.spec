@@ -17,6 +17,7 @@ BuildRequires: python-devel
 BuildRequires: python-setuptools
 
 Requires: collectd
+Requires: collectd-ping
 Requires: libstoraged
 Requires: python-cpopen
 Requires: python-daemon
