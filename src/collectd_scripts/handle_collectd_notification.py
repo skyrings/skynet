@@ -23,6 +23,7 @@ def postTheNotificationToSaltMaster():
     threshold_dict = {}
     caller = salt.client.Caller()
     threshold_dict['tags'], threshold_dict['message'] = getNotification()
+    threshold_dict['severity'] = threshold_dict['tags']["Severity"]
     tag = "skyring/collectd/node/{0}/threshold/{1}/{2}".format(
         threshold_dict['tags']["Host"],
         threshold_dict['tags']["Plugin"],
