@@ -1,0 +1,19 @@
+.\" Manpage for skynetd.
+.\" Contact tjeyasin@redhat.com to correct errors or typos.
+.TH man 8 "21 Mar 2016" "1.0" "skynetd man page"
+.SH NAME
+skynetd \- start skynetd service
+.SH SYNOPSIS
+skynetd [start/stop/reload/restart]
+.SH DESCRIPTION
+skynet is the event agent for skyring. Each storage node managed
+by skyring will have this agent running on them. It is a daemon which listens
+to dbus signals, filters it, processes it and pushes the filtered signals to
+skyring using salt-stack event framework. Currently this daemon has
+capability to send basic storage, process and network related events.
+.SH OPTIONS
+The skynetd does not take any options other than start/stop/restart/reload.
+.SH SEE ALSO
+service(8)
+.SH BUGS
+No known bugs.
