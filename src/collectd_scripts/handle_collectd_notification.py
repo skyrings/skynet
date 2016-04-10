@@ -1,7 +1,7 @@
 #!/usr/bin/python
 import sys
 import os
-import salt.client
+import commands
 
 
 def getNotification():
@@ -21,14 +21,14 @@ def getNotification():
 def postTheNotificationToSaltMaster():
     salt_payload = {}
     threshold_dict = {}
-    caller = salt.client.Caller()
     threshold_dict['tags'], threshold_dict['message'] = getNotification()
     threshold_dict['severity'] = threshold_dict['tags']["Severity"]
     tag = "skyring/collectd/node/{0}/threshold/{1}/{2}".format(
         threshold_dict['tags']["Host"],
         threshold_dict['tags']["Plugin"],
         threshold_dict['tags']["Severity"])
-    caller.sminion.functions['event.send'](tag, threshold_dict)
+    cmd = "sudo salt-call event.fire "'"%s"'" "'"%s"'"" %(str(threshold_dict), tag)
+    commands.getstatusoutput(cmd)
 
 
 if __name__ == '__main__':

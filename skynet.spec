@@ -45,7 +45,6 @@ install -Dm 0644 src/skynetd/conf/skynet.conf.sample $RPM_BUILD_ROOT/etc/skynet/
 install -Dm 0644 src/skynetd/conf/skynet-log.conf.sample $RPM_BUILD_ROOT/etc/skynet/skynet-log.conf
 install -Dm 0644 systemd-skynetd.service $RPM_BUILD_ROOT/usr/lib/systemd/system/systemd-skynetd.service
 install -D src/collectd_scripts/handle_collectd_notification.py $RPM_BUILD_ROOT/usr/lib64/collectd/handle_collectd_notification.py
-install -Dm 0644 src/collectd_scripts/rootWrapper.sh $RPM_BUILD_ROOT/usr/lib64/collectd/rootWrapper.sh
 gzip skynetd.8
 install -Dm 0644 skynetd.8.gz $RPM_BUILD_ROOT%{_mandir}/man8/skynetd.8.gz
 chmod a+x $RPM_BUILD_ROOT%{python_sitelib}/skynetd/skynetd.py
