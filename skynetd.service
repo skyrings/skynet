@@ -1,0 +1,14 @@
+[Unit]
+Description=SkyRing Node Eventing Daemon to push signals to SkyRing
+Documentation=man:skynet(8)
+
+[Service]
+Type=simple
+ExecStart=/usr/bin/skynetd
+ExecReload=/bin/kill -HUP $MAINPID
+KillMode=process
+Restart=on-failure
+PrivateTmp=true
+
+[Install]
+WantedBy=multi-user.target

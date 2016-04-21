@@ -15,7 +15,6 @@
 # limitations under the License.
 
 import signal
-from daemon import runner
 import threading
 import os
 import dbus
@@ -66,11 +65,11 @@ def signalHandler(loop, cb, bus):
     signal handler to handle sighup and sigterm signals
     """
     def sighup_handler(signal, frame):
-        logger.info("Reloading the daemon")
+        logger.info("Reloading skynetd")
         update_listener(cb, bus)
 
     def sigterm_handler(signal, frame):
-        logger.info("Terminating the daemon")
+        logger.info("Terminating skynetd")
         loop.quit()
         global RUN
         RUN = False
@@ -81,15 +80,9 @@ def signalHandler(loop, cb, bus):
 
 
 class Skynetd():
-    def __init__(self):
-        self.stdin_path = '/dev/null'
-        self.stdout_path = '/dev/null'
-        self.stderr_path = '/dev/null'
-        self.pidfile_path = '/var/run/skynetd.pid'
-        self.pidfile_timeout = 5
 
     def run(self):
-        logger.info("Initializing the daemon")
+        logger.info("Initializing skynetd")
         # Using Dbus-python's default mainloop to listen to the events
         DBusGMainLoop(set_as_default=True)
         bus = dbus.SystemBus()
@@ -112,63 +105,22 @@ class Skynetd():
         t = threading.Thread(target=mainSource, args=(loop,))
         t.start()
 
-        # this will continue and listent to external signals (sighup,sigterm)
+        # this will continue and listen to external signals (sighup,sigterm)
         # if sighup, the signals to be listened is reread from the config file
         # if sigterm, the daemon will be terminated
-        logger.info("Started the daemon")
+        logger.info("Started skynetd to listen for external signals")
 
         while RUN:
             signalHandler(loop, cb, bus)
-        logger.info("Terminated the daemon")
-
-
-class SkynetDaemonRunner(runner.DaemonRunner):
-    """
-    This class is inherited from DaemonRunner class and reload
-    action is added here as Daemon Runner has only start, stop
-    and restart action.
-
-    """
-
-    def _reload_daemon_process(self):
-        """
-        Reload the daemon process specified in the current PID file.
-
-        """
-        pid = self.pidfile.read_pid()
-        try:
-            os.kill(pid, signal.SIGHUP)
-        except OSError as err:
-            logger.error("Failed to Reload %(pid)d: %(err)s" % (
-                int(pid), str(err)))
-
-    def _reload(self):
-        """
-        Reload the daemon process specified in the current PID file.
-
-        """
-        if not self.pidfile.is_locked():
-            pidfile_path = self.pidfile.path
-            logger.error("PID file %s not locked" % (str(pidfile_path)))
-
-        if runner.is_pidfile_stale(self.pidfile):
-            self.pidfile.break_lock()
-        else:
-            self._reload_daemon_process()
-
-    action_funcs = runner.DaemonRunner.action_funcs
-    action_funcs.update({u'reload': _reload})
+        logger.info("Terminated skynetd")
 
 
 def main():
-    daemon = Skynetd()
-    daemon_runner = SkynetDaemonRunner(daemon)
-    daemon_runner.daemon_context.files_preserve = [handler.stream]
     try:
-        daemon_runner.do_action()
+        Skynetd().run()
         exit(0)
     except Exception as e:
-        logger.error("Daemon Initialization failed: %s", str(e))
+        logger.error("Skynet Initialization failed: %s", str(e))
         pass
 
 

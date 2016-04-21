@@ -53,8 +53,6 @@ setup(
         'skynetd': 'src/skynetd'
     },
 
-    install_requires=['python-daemon'],
-
     entry_points={
         'console_scripts': [
             'skynetd=skynetd.skynetd:main',

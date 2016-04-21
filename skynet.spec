@@ -19,7 +19,6 @@ BuildRequires: python-setuptools
 Requires: collectd
 Requires: collectd-ping
 Requires: python-cpopen
-Requires: python-daemon
 Requires: python-setuptools
 Requires: salt-minion >= 2015.5.5
 Requires: storaged
@@ -43,7 +42,7 @@ rm -rf $RPM_BUILD_ROOT
 python setup.py install --single-version-externally-managed -O1 --root=$RPM_BUILD_ROOT --record=INSTALLED_FILES
 install -Dm 0644 src/skynetd/conf/skynet.conf.sample $RPM_BUILD_ROOT/etc/skynet/skynet.conf
 install -Dm 0644 src/skynetd/conf/skynet-log.conf.sample $RPM_BUILD_ROOT/etc/skynet/skynet-log.conf
-install -Dm 0644 systemd-skynetd.service $RPM_BUILD_ROOT/usr/lib/systemd/system/systemd-skynetd.service
+install -Dm 0644 skynetd.service $RPM_BUILD_ROOT/usr/lib/systemd/system/skynetd.service
 install -D src/collectd_scripts/handle_collectd_notification.py $RPM_BUILD_ROOT/usr/lib64/collectd/handle_collectd_notification.py
 gzip skynetd.8
 install -Dm 0644 skynetd.8.gz $RPM_BUILD_ROOT%{_mandir}/man8/skynetd.8.gz
@@ -57,7 +56,8 @@ sed -i '/requiretty/s/^/#/g' /etc/sudoers
 
 %post
 dbus-send --system --print-reply --type=method_call --dest=org.storaged.Storaged /org/storaged/Storaged/Manager org.storaged.Storaged.Manager.EnableModules boolean:true
-/bin/systemctl restart systemd-skynetd.service >/dev/null 2>&1 || :
+/bin/systemctl enable skynetd.service >/dev/null 2>&1 || :
+/bin/systemctl restart skynetd.service >/dev/null 2>&1 || :
 if [ `grep -c ^skyring-user /etc/sudoers` = "0" ]; then
     echo "skyring-user ALL=(ALL) NOPASSWD:ALL" | (EDITOR="tee -a" visudo)
 fi
@@ -70,7 +70,7 @@ rm -rf "$RPM_BUILD_ROOT"
 %{_sysconfdir}/skynet/
 %config(noreplace) %{_sysconfdir}/skynet/skynet.conf
 %config(noreplace) %{_sysconfdir}/skynet/skynet-log.conf
-%{_usr}/lib/systemd/system/systemd-skynetd.service
+%{_usr}/lib/systemd/system/skynetd.service
 %{_usr}/lib64/collectd/
 %doc README.md
 %{_mandir}/man8/skynetd.8*
