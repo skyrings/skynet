@@ -23,6 +23,7 @@ Requires: python-setuptools
 Requires: salt-minion >= 2015.5.5
 Requires: storaged
 Requires: storaged-lvm2
+Requires: socat
 
 %description
 SKYNET is the event agent for SKYRING. Each storage node managed
@@ -44,6 +45,7 @@ install -Dm 0644 src/skynetd/conf/skynet.conf.sample $RPM_BUILD_ROOT/etc/skynet/
 install -Dm 0644 src/skynetd/conf/skynet-log.conf.sample $RPM_BUILD_ROOT/etc/skynet/skynet-log.conf
 install -Dm 0644 skynetd.service $RPM_BUILD_ROOT/usr/lib/systemd/system/skynetd.service
 install -D src/collectd_scripts/handle_collectd_notification.py $RPM_BUILD_ROOT/usr/lib64/collectd/handle_collectd_notification.py
+install -Dm 0755 src/collectd_scripts/ifspeed.sh $RPM_BUILD_ROOT/usr/lib64/collectd/ifspeed.sh
 gzip skynetd.8
 install -Dm 0644 skynetd.8.gz $RPM_BUILD_ROOT%{_mandir}/man8/skynetd.8.gz
 chmod a+x $RPM_BUILD_ROOT%{python_sitelib}/skynetd/skynetd.py
