@@ -73,5 +73,15 @@ val=0
 if (( $(echo "$sigma_denominator > 0" |bc -l) )); then
   val=`echo $sigma_numerator/$sigma_denominator|bc -l`
 fi
-table_name=$ESC_HOSTNAME/interface-average/percent-network_utilization
+
+table_name=$HOSTNAME/interface-average/percent-network_utilization
 echo "PUTVAL $table_name interval=$INTERVAL $time:$val"
+
+table_name=$HOSTNAME/interface-average/bytes-total_bandwidth
+sigma_denominator=`echo $sigma_denominator/$no_of_secs|bc -l`
+sigma_denominator=`echo $sigma_denominator/8|bc -l`
+echo "PUTVAL $table_name interval=$INTERVAL $time:$sigma_denominator"
+
+table_name=$HOSTNAME/interface-average/bytes-total_bandwidth_used
+sigma_numerator=`echo $sigma_numerator/8|bc -l`
+echo "PUTVAL $table_name interval=$INTERVAL $time:$sigma_numerator"
