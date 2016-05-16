@@ -41,6 +41,7 @@ python setup.py build
 %install
 rm -rf $RPM_BUILD_ROOT
 python setup.py install --single-version-externally-managed -O1 --root=$RPM_BUILD_ROOT --record=INSTALLED_FILES
+install -Dm 0644 conf/skynet_logrotate.conf.sample $RPM_BUILD_ROOT/etc/logrotate.d/skynet
 install -Dm 0644 src/skynetd/conf/skynet.conf.sample $RPM_BUILD_ROOT/etc/skynet/skynet.conf
 install -Dm 0644 src/skynetd/conf/skynet-log.conf.sample $RPM_BUILD_ROOT/etc/skynet/skynet-log.conf
 install -Dm 0644 skynetd.service $RPM_BUILD_ROOT/usr/lib/systemd/system/skynetd.service
@@ -49,19 +50,6 @@ install -Dm 0755 src/collectd_scripts/ifspeed.sh $RPM_BUILD_ROOT/usr/lib64/colle
 gzip skynetd.8
 install -Dm 0644 skynetd.8.gz $RPM_BUILD_ROOT%{_mandir}/man8/skynetd.8.gz
 chmod a+x $RPM_BUILD_ROOT%{python_sitelib}/skynetd/skynetd.py
-
-# Configuring Logrotation
-cat <<EOF >/etc/logrotate.d/skynet
-/var/log/skynet/*.log {
-    su root root
-    size=100M
-    rotate 10
-    missingok
-    compress
-    notifempty
-    create 0664 root root
-}
-EOF
 
 %pre
 if [ `grep -c ^skyring-user /etc/passwd` = "0" ]; then
@@ -83,6 +71,7 @@ rm -rf "$RPM_BUILD_ROOT"
 %files -f INSTALLED_FILES
 %defattr(-,root,root)
 %{_sysconfdir}/skynet/
+%{_sysconfdir}/logrotate.d/skynet
 %config(noreplace) %{_sysconfdir}/skynet/skynet.conf
 %config(noreplace) %{_sysconfdir}/skynet/skynet-log.conf
 %{_usr}/lib/systemd/system/skynetd.service

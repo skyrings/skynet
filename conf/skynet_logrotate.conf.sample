@@ -1,0 +1,9 @@
+/var/log/skynet/*.log {
+    su root root
+    size=100M
+    rotate 10
+    missingok
+    compress
+    notifempty
+    create 0664 root root
+}
