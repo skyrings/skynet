@@ -5,7 +5,7 @@ PRINT_STATUS = export EC=$$?; cd $(CWD); if [ "$$EC" -eq "0" ]; then printf "SUC
 
 BUILDS    := .build
 DEPLOY    := $(BUILDS)/deploy
-VERSION   := 0.0.1
+VERSION   := 0.0.7
 TARDIR    := skynet-$(VERSION)
 RPMBUILD  := $(HOME)/rpmbuild
 
