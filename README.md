@@ -16,3 +16,16 @@ SkyNet development happens in [gerrithub.io](https://review.gerrithub.io/#/admin
 # Licensing
 SkyNet is licensed under the Apache License, Version 2.0.  See [LICENSE](https://github.com/skyrings/skynet/blob/master/LICENSE) for the full license text.
 
+# Releasing
+1. Bump the version number in `src/skynetd/__init__.py` and commit your
+   changes with the standard commit message.
+
+```
+python setup.py bump
+```
+
+2. Tag and push directly to the `origin` Git remote.
+
+```
+python setup.py release
+```
