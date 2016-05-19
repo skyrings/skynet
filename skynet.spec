@@ -65,9 +65,6 @@ if [ `grep -c ^skyring-user /etc/sudoers` = "0" ]; then
     echo "skyring-user ALL=(ALL) NOPASSWD:ALL" | (EDITOR="tee -a" visudo)
 fi
 
-%clean
-rm -rf "$RPM_BUILD_ROOT"
-
 %files -f INSTALLED_FILES
 %defattr(-,root,root)
 %{_sysconfdir}/skynet/
