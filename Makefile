@@ -2,10 +2,10 @@
 CWD := $(shell pwd)
 BASEDIR := $(CWD)
 PRINT_STATUS = export EC=$$?; cd $(CWD); if [ "$$EC" -eq "0" ]; then printf "SUCCESS!\n"; else exit $$EC; fi
+VERSION   = $(shell grep __version__ src/skynetd/__init__.py | sed "s/.*= '\(.*\)'/\1/")
 
 BUILDS    := .build
 DEPLOY    := $(BUILDS)/deploy
-VERSION   := 0.0.7
 TARDIR    := skynet-$(VERSION)
 RPMBUILD  := $(HOME)/rpmbuild
 
