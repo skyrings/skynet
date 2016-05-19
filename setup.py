@@ -13,11 +13,20 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import re
 from setuptools import setup
+
+
+def read_module_contents():
+    with open('src/skynetd/__init__.py') as skynet_init:
+        return skynet_init.read()
+
+module_file = read_module_contents()
+metadata = dict(re.findall("__([a-z]+)__\s*=\s*'([^']+)'", module_file))
 
 setup(
     name='skynet',
-    version='1',
+    version=metadata['version'],
     description='Skyring Node Eventing Agent',
     long_description="skynet is the node eventing agent for Skyring."
     " Each storage node managed by Skyring will have this agent running on"
