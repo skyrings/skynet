@@ -26,7 +26,10 @@ rpm:
 	@echo  "  ...building rpm $(V_ARCH)..."
 	rm -fr $(BUILDS)
 	mkdir -p $(DEPLOY)/latest
-	rpmbuild -ba skynet.spec
+	mkdir -p $(RPMBUILD)/SPECS
+	sed -e "s/@VERSION@/$(VERSION)/" skynet.spec \
+		> $(RPMBUILD)/SPECS/skynet.spec
+	rpmbuild -ba $(RPMBUILD)/SPECS/skynet.spec
 	$(PRINT_STATUS); \
 	if [ "$$EC" -eq "0" ]; then \
 		FILE=$$(readlink -f $$(find $(RPMBUILD)/RPMS -name skynet-$(VERSION)*.rpm)); \

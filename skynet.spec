@@ -1,5 +1,5 @@
 %define pkg_name skynet
-%define pkg_version 0.0.1
+%define pkg_version @VERSION@
 %define pkg_release 1
 
 Name: %{pkg_name}
