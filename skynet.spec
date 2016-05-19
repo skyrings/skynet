@@ -10,7 +10,6 @@ Summary: SKYRING Node Event Agent
 Source0: %{pkg_name}-%{pkg_version}.tar.gz
 License: ASL 2.0
 Group: Development/Libraries
-BuildRoot: %{_tmppath}/%{pkg_name}-%{pkg_version}-%{pkg_release}-buildroot
 Url: https://github.com/skyrings/skynet
 
 BuildRequires: python-devel
