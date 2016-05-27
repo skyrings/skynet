@@ -23,6 +23,7 @@ Requires: salt-minion >= 2015.5.5
 Requires: storaged
 Requires: storaged-lvm2
 Requires: socat
+Requires: bc
 
 %description
 SKYNET is the event agent for SKYRING. Each storage node managed
