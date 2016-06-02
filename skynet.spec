@@ -55,15 +55,14 @@ chmod a+x $RPM_BUILD_ROOT%{python_sitelib}/skynetd/skynetd.py
 if [ `grep -c ^skyring-user /etc/passwd` = "0" ]; then
     /usr/sbin/useradd skyring-user -g wheel
 fi
-sed -i '/requiretty/s/^/#/g' /etc/sudoers
+
 
 %post
 dbus-send --system --print-reply --type=method_call --dest=org.storaged.Storaged /org/storaged/Storaged/Manager org.storaged.Storaged.Manager.EnableModules boolean:true
 /bin/systemctl enable skynetd.service >/dev/null 2>&1 || :
 /bin/systemctl restart skynetd.service >/dev/null 2>&1 || :
-if [ `grep -c ^skyring-user /etc/sudoers` = "0" ]; then
-    echo "skyring-user ALL=(ALL) NOPASSWD:ALL" | (EDITOR="tee -a" visudo)
-fi
+echo "skyring-user ALL=(ALL) NOPASSWD:ALL" > /etc/sudoers.d/skyring-user || :
+echo 'Defaults:skyring-user !requiretty' >> /etc/sudoers.d/skyring-user
 
 %files -f INSTALLED_FILES
 %defattr(-,root,root)
