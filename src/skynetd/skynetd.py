@@ -22,6 +22,7 @@ import glib
 from dbus.mainloop.glib import DBusGMainLoop
 import callback
 import salt.client
+import utils
 from logger import logger, handler
 
 RUN = True
@@ -116,6 +117,12 @@ class Skynetd():
 
 
 def main():
+    cmd = ["dbus-send", "--system", "--type=method_call", "--dest=org.storaged.Storaged",
+           "/org/storaged/Storaged/Manager", "org.storaged.Storaged.Manager.EnableModules", "boolean:true"]
+    rc, out, err = utils.execCmd(cmd)
+    if rc != 0 :
+        logger.error("Could not enable Storaged module")
+
     try:
         Skynetd().run()
         exit(0)
