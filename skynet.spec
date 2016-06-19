@@ -50,6 +50,19 @@ gzip skynetd.8
 install -Dm 0644 skynetd.8.gz $RPM_BUILD_ROOT%{_mandir}/man8/skynetd.8.gz
 chmod a+x $RPM_BUILD_ROOT%{python_sitelib}/skynetd/skynetd.py
 
+# Configuring Logrotation
+cat <<EOF >/etc/logrotate.d/skynet
+/var/log/skynet/*.log {
+    su root root
+    size=100M
+    rotate 10
+    missingok
+    compress
+    notifempty
+    create 0664 root root
+}
+EOF
+
 %pre
 if [ `grep -c ^skyring-user /etc/passwd` = "0" ]; then
     /usr/sbin/useradd skyring-user -g wheel
