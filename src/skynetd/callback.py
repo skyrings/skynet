@@ -162,6 +162,8 @@ class Callback(object):
 
     @dbus_signal_handler
     def drive_add(self, a, d, path):
+        if not hasattr(d, '__iter__'):
+	    return None, None
         for k, v in d.iteritems():
             if k.split('.')[-1] == "Drive":
                 res = {}
@@ -180,9 +182,13 @@ class Callback(object):
                 tag = "skyring/dbus/node/{0}/generic/storage/drive/"\
                       "added".format(self.minion_id)
                 return res, tag
+	else:
+	    return None, None
 
     @dbus_signal_handler
     def drive_remove(self, a, d, path):
+	if not hasattr(d, '__iter__'):
+	    return None, None
         for e in d:
             if e.split('.')[-1] == "Drive":
                 res = {}
@@ -195,6 +201,8 @@ class Callback(object):
                 tag = "skyring/dbus/node/{0}/generic/storage/drive/"\
                       "removed".format(self.minion_id)
                 return res, tag
+	else:
+	    return None, None
 
     @dbus_signal_handler
     def drive_corruption(self, a, d, c, path):
@@ -241,6 +249,8 @@ class Callback(object):
     def block_add(self, a, d, path):
         res = {}
         res["tags"] = {}
+	if not hasattr(d, '__iter__'):
+	    return None, None
         for e, v in d.iteritems():
             if e.split('.')[-1] == "Block":
                 deviceName = ""
@@ -264,6 +274,8 @@ class Callback(object):
                 res["tags"]["size"] = str(v.get("Size"))
                 res["tags"]["Table"] = str(v.get("Table")).split('/')[-1]
                 res["tags"]["Type"] = str(v.get("Type"))
+	else:
+	    return None, None
 
         if res['tags']:
             tag = "skyring/dbus/node/{0}/generic/storage/block/added".format(
@@ -272,6 +284,8 @@ class Callback(object):
 
     @dbus_signal_handler
     def block_remove(self, a, d, path):
+	if not hasattr(d, '__iter__'):
+	    return None, None
         for e in d:
             if e.split('.')[-1] == "Block":
                 res = {}
@@ -284,6 +298,8 @@ class Callback(object):
                 tag = "skyring/dbus/node/{0}/generic/storage/block/"\
                 "removed".format(self.minion_id)
                 return res, tag
+	else:
+	    return None, None
 
     @dbus_signal_handler
     def mount_state_change(self, a, d, c, path):
