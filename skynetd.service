@@ -1,6 +1,6 @@
 [Unit]
 Description=SkyRing Node Eventing Daemon to push signals to SkyRing
-Documentation=man:skynet(8)
+Documentation=man:skynetd(8)
 
 [Service]
 Type=simple
