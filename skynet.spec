@@ -39,7 +39,6 @@ capability to send basic storage, process and network related events.
 python setup.py build
 
 %install
-rm -rf $RPM_BUILD_ROOT
 python setup.py install --single-version-externally-managed -O1 --root=$RPM_BUILD_ROOT --record=INSTALLED_FILES
 install -Dm 0644 conf/skynet_logrotate.conf.sample $RPM_BUILD_ROOT/etc/logrotate.d/skynet
 install -Dm 0644 src/skynetd/conf/skynet.conf.sample $RPM_BUILD_ROOT/etc/skynet/skynet.conf
