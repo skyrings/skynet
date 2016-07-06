@@ -65,7 +65,6 @@ echo "skyring-user ALL=(ALL) NOPASSWD:ALL" > /etc/sudoers.d/skyring-user || :
 echo 'Defaults:skyring-user !requiretty' >> /etc/sudoers.d/skyring-user
 
 %files -f INSTALLED_FILES
-%defattr(-,root,root)
 %{_sysconfdir}/skynet/
 %{_sysconfdir}/logrotate.d/skynet
 %config(noreplace) %{_sysconfdir}/skynet/skynet.conf
