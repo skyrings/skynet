@@ -1,7 +1,7 @@
 %define pkg_name skynet
 %define pkg_version @VERSION@
 %define pkg_release 1
-%define pkg_parent skyring
+%define pkg_parent skyring-core
 
 Name: %{pkg_name}
 Version: %{pkg_version}
