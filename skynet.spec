@@ -1,14 +1,11 @@
-%define pkg_name skynet
-%define pkg_version @VERSION@
-%define pkg_release 1
 %define pkg_parent skyring-core
 
-Name: %{pkg_name}
-Version: %{pkg_version}
-Release: %{pkg_release}%{?dist}
+Name: skynet
+Version: @VERSION@
+Release: 1%{?dist}
 BuildArch: noarch
 Summary: SKYRING Node Event Agent
-Source0: %{pkg_name}-%{pkg_version}.tar.gz
+Source0: %{name}-%{version}.tar.gz
 License: ASL 2.0
 Group: Development/Libraries
 Url: https://github.com/skyrings/skynet
@@ -36,7 +33,7 @@ SKYRING using salt-stack event framework. Currently this daemon has
 capability to send basic storage, process and network related events.
 
 %prep
-%setup -n %{pkg_name}-%{pkg_version}
+%setup
 
 %build
 python setup.py build
