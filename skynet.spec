@@ -41,6 +41,7 @@ python setup.py build
 %install
 python setup.py install --single-version-externally-managed -O1 --root=$RPM_BUILD_ROOT --record=INSTALLED_FILES
 install -Dm 0644 conf/skynet_logrotate.conf.sample $RPM_BUILD_ROOT/etc/logrotate.d/skynet
+install -Dm 0644 conf/skynet-sudoers.conf $RPM_BUILD_ROOT/%{_sysconfdir}/sudoers.d/skynet-sudoers
 install -Dm 0644 src/skynetd/conf/skynet.conf.sample $RPM_BUILD_ROOT/etc/skynet/skynet.conf
 install -Dm 0644 src/skynetd/conf/skynet-log.conf.sample $RPM_BUILD_ROOT/etc/skynet/skynet-log.conf
 install -Dm 0644 skynetd.service $RPM_BUILD_ROOT/usr/lib/systemd/system/skynetd.service
@@ -60,12 +61,11 @@ fi
 dbus-send --system --print-reply --type=method_call --dest=org.storaged.Storaged /org/storaged/Storaged/Manager org.storaged.Storaged.Manager.EnableModules boolean:true
 /bin/systemctl enable skynetd.service >/dev/null 2>&1 || :
 /bin/systemctl restart skynetd.service >/dev/null 2>&1 || :
-echo "skyring-user ALL=(ALL) NOPASSWD:ALL" > /etc/sudoers.d/skyring-user || :
-echo 'Defaults:skyring-user !requiretty' >> /etc/sudoers.d/skyring-user
 
 %files -f INSTALLED_FILES
 %{_sysconfdir}/skynet/
 %{_sysconfdir}/logrotate.d/skynet
+%{_sysconfdir}/sudoers.d/skynet-sudoers
 %config(noreplace) %{_sysconfdir}/skynet/skynet.conf
 %config(noreplace) %{_sysconfdir}/skynet/skynet-log.conf
 %{_usr}/lib/systemd/system/skynetd.service
