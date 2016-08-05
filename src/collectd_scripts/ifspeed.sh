@@ -1,8 +1,7 @@
 #!/bin/bash
 HOSTNAME="${COLLECTD_HOSTNAME:-`hostname -f`}"
-INTERVAL="${COLLECTD_INTERVAL:-10}"
+INTERVAL="${COLLECTD_INTERVAL:-600}"
 re='^[0-9]+$'
-no_of_secs=10
 ESC_HOSTNAME=`echo $HOSTNAME | tr . _`
 sigma_numerator=0.00
 sigma_denominator=0.00
@@ -25,41 +24,15 @@ do
   tx=`echo ${txs[1]}`
   tx=`printf "%f" $tx`
 
-  sleep $no_of_secs
-
-  uSocMsg=`echo "GETVAL $table_name"|sudo socat - UNIX-CLIENT:/var/run/collectd-unixsock`
-  rxtx=`echo $uSocMsg|echo ${uSocMsg/*$rx_tx/$rx_tx}`
-
-  values=( $rxtx )
-
-  rxs=(${values[0]//=/ })
-  curr_rx=`echo ${rxs[1]}`
-  curr_rx=`printf "%f" $curr_rx`
-
-  txs=(${values[1]//=/ })
-  curr_tx=`echo ${txs[1]}`
-  curr_tx=`printf "%f" $curr_tx`
-
-  delta_rx=`echo $rx-$curr_rx|bc -l`
-  if (( $(echo "$delta_rx < 0" |bc -l) )); then
-    delta_rx=`echo $curr_rx-$rx|bc -l`
-  fi
-
-  delta_tx=`echo $tx-$curr_tx|bc -l`
-  if (( $(echo "$delta_tx < 0" |bc -l) )); then
-    delta_tx=`echo $curr_tx-$tx|bc -l`
-  fi
-
   ifSpeed=`echo $speed*1000000|bc -l`
 
-  numerator=`echo $delta_rx+$delta_tx|bc -l`
+  numerator=`echo $rx+$tx|bc -l`
   numerator=`echo $numerator*8*100 |bc -l`
   sigma_numerator=`echo $sigma_numerator+$numerator|bc -l`
 
-  denominator=`echo $no_of_secs*$ifSpeed|bc -l`
-  sigma_denominator=`echo $sigma_denominator+$denominator|bc -l`
+  sigma_denominator=`echo $sigma_denominator+$ifSpeed|bc -l`
 
-  val=`echo $numerator/$denominator|bc -l`
+  val=`echo $numerator/$ifSpeed|bc -l`
   val=`printf "%f" $val`
 
   time="$(date +%s)"
@@ -80,10 +53,10 @@ if (( $(echo "$sigma_denominator > 0" |bc -l) )); then
 fi
 
 table_name=$HOSTNAME/interface-average/bytes-total_bandwidth
-sigma_denominator=`echo $sigma_denominator/$no_of_secs|bc -l`
 sigma_denominator=`echo $sigma_denominator/8|bc -l`
 echo "PUTVAL $table_name interval=$INTERVAL $time:$sigma_denominator"
 
 table_name=$HOSTNAME/interface-average/bytes-total_bandwidth_used
 sigma_numerator=`echo $sigma_numerator/8|bc -l`
+sigma_numerator=`echo $sigma_numerator/100|bc -l`
 echo "PUTVAL $table_name interval=$INTERVAL $time:$sigma_numerator"
