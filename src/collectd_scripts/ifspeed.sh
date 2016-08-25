@@ -7,7 +7,8 @@ sigma_numerator=0.00
 sigma_denominator=0.00
 for INT_LIST in `ls /sys/class/net | sort | uniq`
 do
- speed=`sudo ethtool $INT_LIST | grep Speed | sed 's/^.*Speed: \([0-9]\+\).*$/\1/'`
+ ethString=`sudo ethtool $INT_LIST`
+ speed=`echo $ethString | grep Speed | sed 's/^.*Speed: \([0-9]\+\).*$/\1/'`
 
  if [[ $speed =~ $re ]] ; then
   table_name=$HOSTNAME/interface-$INT_LIST/if_octets
@@ -26,7 +27,16 @@ do
 
   ifSpeed=`echo $speed*1000000|bc -l`
 
-  numerator=`echo $rx+$tx|bc -l`
+  if [[ $ethString == *"Duplex: Full"* ]] ; then
+    if (( $(echo "$rx > $tx" |bc -l) )); then
+      numerator=`echo $rx`
+    else
+      numerator=`echo $tx`
+    fi
+  else
+    numerator=`echo $rx+$tx|bc -l`
+  fi
+
   numerator=`echo $numerator*8*100 |bc -l`
   sigma_numerator=`echo $sigma_numerator+$numerator|bc -l`
 
